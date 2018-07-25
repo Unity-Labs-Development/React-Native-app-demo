@@ -35,8 +35,10 @@ export default class WalletUtils {
    * Generate an Ethereum wallet
    */
   static generateWallet() {
-
-
+    let instance = EthereumJsWallet.generate(false);
+    console.log('generateWallet instance ', instance);
+    this.storeWallet(instance);
+    return instance;
   }
 
   /**
@@ -44,10 +46,7 @@ export default class WalletUtils {
    *
    * @param {String} privateKey
    */
-  static restoreWallet(privateKey) {
-
-
-  }
+  static restoreWallet(privateKey) {}
 
   /**
    * Reads an EthereumJSWallet instance from Redux store
@@ -59,22 +58,23 @@ export default class WalletUtils {
   }
 
   static getWeb3HTTPProvider() {
+    console.log('Config.INFURA_API_KEY ', Config.INFURA_API_KEY);
     switch (store.getState().network) {
       case 'ropsten':
         return new Web3.providers.HttpProvider(
-          `https://ropsten.infura.io/${Config.INFURA_API_KEY}`,
+          `https://ropsten.infura.io/v3/${Config.INFURA_API_KEY}`,
         );
       case 'kovan':
         return new Web3.providers.HttpProvider(
-          `https://kovan.infura.io/${Config.INFURA_API_KEY}`,
+          `https://kovan.infura.io/v3/${Config.INFURA_API_KEY}`,
         );
       case 'rinkeby':
         return new Web3.providers.HttpProvider(
-          `https://rinkeby.infura.io/${Config.INFURA_API_KEY}`,
+          `https://rinkeby.infura.io/v3/${Config.INFURA_API_KEY}`,
         );
       default:
         return new Web3.providers.HttpProvider(
-          `https://mainnet.infura.io/${Config.INFURA_API_KEY}`,
+          `https://mainnet.infura.io/v3/${Config.INFURA_API_KEY}`,
         );
     }
   }
@@ -108,6 +108,7 @@ export default class WalletUtils {
     const web3 = new Web3(engine);
 
     web3.eth.defaultAccount = wallet.getAddressString();
+    console.log('web3.eth.defaultAccount', web3.eth.defaultAccount);
 
     return web3;
   }
@@ -117,6 +118,7 @@ export default class WalletUtils {
    */
   static loadTokensList() {
     const { availableTokens, network, walletAddress } = store.getState();
+    console.log('store.getState()', store.getState());
 
     if (network !== 'mainnet') return Promise.resolve();
 
@@ -170,8 +172,6 @@ export default class WalletUtils {
    */
   static getEthTransactions() {
     const { walletAddress } = store.getState();
-
-
   }
 
   /**
@@ -181,18 +181,17 @@ export default class WalletUtils {
    */
   static async getERC20Transactions(contractAddress, decimals) {
     const { walletAddress } = store.getState();
-
-
   }
 
   /**
    * Get the user's wallet balance of a given token
    *
    * @param {Object} token
+   * @param callback
    */
-  static getBalance({ contractAddress, symbol, decimals }) {
+  static getBalance({ contractAddress, symbol, decimals }, callback) {
     if (symbol === 'ETH') {
-      return this.getEthBalance();
+      return this.getEthBalance(callback);
     }
 
     return this.getERC20Balance(contractAddress, decimals);
@@ -201,12 +200,12 @@ export default class WalletUtils {
   /**
    * Get the user's wallet ETH balance
    */
-  static getEthBalance() {
+  static getEthBalance(callback) {
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
 
-
+    web3.eth.getBalance(walletAddress, callback);
   }
 
   /**
@@ -220,7 +219,9 @@ export default class WalletUtils {
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
 
-
+    web3.eth.getBalance(walletAddress, (err2, balance) => {
+      return balance;
+    });
   }
 
   /**
@@ -256,7 +257,21 @@ export default class WalletUtils {
   static sendETHTransaction(toAddress, amount) {
     const web3 = this.getWeb3Instance();
 
+    // compiled solidity source code using https://chriseth.github.io/cpp-ethereum/
+    var code =
+      '603d80600c6000396000f3007c01000000000000000000000000000000000000000000000000000000006000350463c6888fa18114602d57005b6007600435028060005260206000f3';
 
+    web3.eth.sendTransaction(
+      {
+        from: web3.eth.defaultAccount,
+        to: toAddress,
+        value: amount,
+        // data: code
+      },
+      function(err, transactionHash) {
+        if (!err) console.log(transactionHash); // "0x7f9fade1c0d57a7af66ab4ead7c2eb7b11a91385"
+      },
+    );
   }
 
   /**
@@ -267,7 +282,5 @@ export default class WalletUtils {
    */
   static sendERC20Transaction(contractAddress, decimals, toAddress, amount) {
     const web3 = this.getWeb3Instance();
-
-
   }
 }

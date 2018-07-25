@@ -137,13 +137,12 @@ class WalletHome extends Component {
     AppState.removeEventListener('change', this.handleAppStateChange);
   };
 
-  fetchBalance = async () => {
-    const currentBalance = await WalletUtils.getBalance(
-      this.props.selectedToken,
-    );
-
-    this.setState({
-      currentBalance,
+  fetchBalance = () => {
+    WalletUtils.getBalance(this.props.selectedToken, (err2, balance) => {
+      console.log('fetchBalance balance', balance.toNumber());
+      this.setState({
+        currentBalance: balance.toNumber(),
+      });
     });
   };
 
