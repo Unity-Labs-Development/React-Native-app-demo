@@ -137,12 +137,14 @@ class WalletHome extends Component {
     AppState.removeEventListener('change', this.handleAppStateChange);
   };
 
-  fetchBalance = () => {
-    WalletUtils.getBalance(this.props.selectedToken, (err2, balance) => {
-      console.log('fetchBalance balance', balance.toNumber());
-      this.setState({
-        currentBalance: balance.toNumber(),
-      });
+  fetchBalance = async () => {
+    const currentBalance = await WalletUtils.getBalance(
+      this.props.selectedToken,
+    );
+    console.log('currentBalance', currentBalance.toNumber());
+
+    this.setState({
+      currentBalance: currentBalance.toNumber(),
     });
   };
 
@@ -197,7 +199,7 @@ class WalletHome extends Component {
               {!!this.props.walletAddress && (
                 <TransactionsList
                   selectedToken={this.props.selectedToken}
-                  transactions={this.state.transactions}
+                  transactions={this.state.transactions || []}
                   walletAddress={this.props.walletAddress}
                   onRefresh={this.onRefresh}
                   refreshing={this.state.refreshingTransactions}

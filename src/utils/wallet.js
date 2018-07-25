@@ -161,7 +161,7 @@ export default class WalletUtils {
    */
   static getTransactions({ contractAddress, decimals, symbol }) {
     if (symbol === 'ETH') {
-      return this.getEthTransactions();
+      return this.getEthTransactions(callback);
     }
 
     return this.getERC20Transactions(contractAddress, decimals);
@@ -172,6 +172,10 @@ export default class WalletUtils {
    */
   static getEthTransactions() {
     const { walletAddress } = store.getState();
+
+    const web3 = new Web3(this.getWeb3HTTPProvider());
+
+    web3.eth.getTransaction(walletAddress);
   }
 
   /**
@@ -200,12 +204,17 @@ export default class WalletUtils {
   /**
    * Get the user's wallet ETH balance
    */
-  static getEthBalance(callback) {
+  static getEthBalance() {
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
 
-    web3.eth.getBalance(walletAddress, callback);
+    return new Promise((resolve, reject) => {
+      web3.eth.getBalance(walletAddress, (err2, balance) => {
+        resolve(balance);
+        reject(err2);
+      });
+    });
   }
 
   /**
@@ -219,8 +228,11 @@ export default class WalletUtils {
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
 
-    web3.eth.getBalance(walletAddress, (err2, balance) => {
-      return balance;
+    return new Promise((resolve, reject) => {
+      web3.eth.getBalance(walletAddress, (err2, balance) => {
+        resolve(balance);
+        reject(err2);
+      });
     });
   }
 
