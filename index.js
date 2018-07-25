@@ -40,4 +40,4 @@ const App = () => (
   </Provider>
 );
 
-AppRegistry.registerComponent('rnapp', () => App);
+AppRegistry.registerComponent('Eltwallet', () => App);
