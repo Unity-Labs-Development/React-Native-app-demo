@@ -171,6 +171,7 @@ export default class WalletUtils {
    * Fetch a list of ETH transactions for the user's wallet
    */
   static getEthTransactions() {
+    console.log('getEthTransactions');
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
@@ -184,6 +185,8 @@ export default class WalletUtils {
    * @param {String} contractAddress
    */
   static async getERC20Transactions(contractAddress, decimals) {
+    console.log('getERC20Transactions');
+
     const { walletAddress } = store.getState();
   }
 
@@ -205,6 +208,8 @@ export default class WalletUtils {
    * Get the user's wallet ETH balance
    */
   static getEthBalance() {
+    console.log('getEthBalance');
+
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
@@ -224,6 +229,8 @@ export default class WalletUtils {
    * @param {Number} decimals
    */
   static getERC20Balance(contractAddress, decimals) {
+    console.log('getERC20Balance');
+
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
