@@ -36,7 +36,6 @@ export default class WalletUtils {
    */
   static generateWallet() {
     let instance = EthereumJsWallet.generate(false);
-    console.log('generateWallet instance ', instance);
     this.storeWallet(instance);
     return instance;
   }
@@ -172,7 +171,6 @@ export default class WalletUtils {
    * Fetch a list of ETH transactions for the user's wallet
    */
   static getEthTransactions() {
-    console.log('getEthTransactions');
     const { walletAddress } = store.getState();
 
     return fetch(
@@ -182,7 +180,6 @@ export default class WalletUtils {
     )
       .then(response => response.json())
       .then(data => {
-        console.log('getEthTransactions data', data);
         return data.result;
       });
   }
@@ -193,8 +190,6 @@ export default class WalletUtils {
    * @param {String} contractAddress
    */
   static async getERC20Transactions(contractAddress, decimals) {
-    console.log('getERC20Transactions');
-
     const { walletAddress } = store.getState();
   }
 
@@ -215,16 +210,17 @@ export default class WalletUtils {
    * Get the user's wallet ETH balance
    */
   static getEthBalance() {
-    console.log('getEthBalance');
-
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
 
     return new Promise((resolve, reject) => {
-      web3.eth.getBalance(walletAddress, (err2, balance) => {
-        resolve(balance.toNumber());
-        reject(err2);
+      web3.eth.getBalance(walletAddress, (err, balance) => {
+        if (!err) {
+          resolve(balance.toNumber());
+        } else {
+          reject(err);
+        }
       });
     });
   }
@@ -236,18 +232,9 @@ export default class WalletUtils {
    * @param {Number} decimals
    */
   static getERC20Balance(contractAddress, decimals) {
-    console.log('getERC20Balance');
-
     const { walletAddress } = store.getState();
 
     const web3 = new Web3(this.getWeb3HTTPProvider());
-
-    return new Promise((resolve, reject) => {
-      web3.eth.getBalance(walletAddress, (err2, balance) => {
-        resolve(balance);
-        reject(err2);
-      });
-    });
   }
 
   /**
@@ -282,7 +269,6 @@ export default class WalletUtils {
    */
   static sendETHTransaction(toAddress, amount) {
     const web3 = this.getWeb3Instance();
-    console.log('sendETHTransaction toAddress ', toAddress, ' amount ', amount);
 
     return new Promise((resolve, reject) => {
       web3.eth.sendTransaction(
@@ -294,7 +280,6 @@ export default class WalletUtils {
         (err, transactionHash) => {
           if (!err) {
             resolve(transactionHash);
-            console.log('sendETHTransaction transactionHash', transactionHash);
           } else {
             reject(err);
           }
