@@ -173,14 +173,24 @@ export default class WalletUtils {
   static getEthTransactions() {
     const { walletAddress } = store.getState();
 
+    const web3 = this.getWeb3Instance();
+
     return fetch(
-      `http://${this.getEtherscanApiSubdomain()}.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${
+      `http://${this.getEtherscanApiSubdomain()}.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${
         Config.ETHERSCAN_API_KEY
       }`,
     )
       .then(response => response.json())
       .then(data => {
-        return data.result;
+        return data.result.map(item => {
+          //convert from wei to ether
+          let value = web3.toBigNumber(item.value);
+          item.value = web3
+            .fromWei(value, 'ether')
+            .toNumber()
+            .toExponential(2);
+          return item;
+        });
       });
   }
 
