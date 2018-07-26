@@ -282,17 +282,23 @@ export default class WalletUtils {
     const web3 = this.getWeb3Instance();
     console.log('sendETHTransaction toAddress ', toAddress, ' amount ', amount);
 
-    web3.eth.sendTransaction(
-      {
-        from: web3.eth.defaultAccount,
-        to: toAddress,
-        value: amount,
-      },
-      function(err, transactionHash) {
-        if (!err)
-          console.log('sendETHTransaction transactionHash', transactionHash);
-      },
-    );
+    return new Promise((resolve, reject) => {
+      web3.eth.sendTransaction(
+        {
+          from: web3.eth.defaultAccount,
+          to: toAddress,
+          value: amount,
+        },
+        (err, transactionHash) => {
+          if (!err) {
+            resolve(transactionHash);
+            console.log('sendETHTransaction transactionHash', transactionHash);
+          } else {
+            reject(err);
+          }
+        },
+      );
+    });
   }
 
   /**
