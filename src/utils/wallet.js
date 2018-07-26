@@ -217,7 +217,8 @@ export default class WalletUtils {
     return new Promise((resolve, reject) => {
       web3.eth.getBalance(walletAddress, (err, balance) => {
         if (!err) {
-          resolve(balance.toNumber());
+          //balance address in wei,transfer to ether
+          resolve(web3.fromWei(balance, 'ether').toNumber());
         } else {
           reject(err);
         }

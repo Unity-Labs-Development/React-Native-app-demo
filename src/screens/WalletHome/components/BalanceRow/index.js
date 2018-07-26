@@ -76,7 +76,8 @@ class BalanceRow extends Component {
       <View style={styles.container}>
         <View style={styles.balanceContainer}>
           <Text style={styles.balance} letterSpacing={1}>
-            {currentBalance.toFixed(2)}
+            {/*{currentBalance.toFixed(2)}*/}
+            {Math.floor(currentBalance * 100) / 100 + ''}
           </Text>
           <Text style={styles.coinSymbol} letterSpacing={2}>
             {selectedToken.symbol}
