@@ -46,7 +46,11 @@ export default class WalletUtils {
    *
    * @param {String} privateKey
    */
-  static restoreWallet(privateKey) {}
+  static restoreWallet(privateKey) {
+    this.storeWallet(
+      EthereumJsWallet.fromPrivateKey(Buffer.from(privateKey, 'hex')),
+    );
+  }
 
   /**
    * Reads an EthereumJSWallet instance from Redux store
@@ -107,7 +111,6 @@ export default class WalletUtils {
     const web3 = new Web3(engine);
 
     web3.eth.defaultAccount = wallet.getAddressString();
-    console.log('web3.eth.defaultAccount', web3.eth.defaultAccount);
 
     return web3;
   }
@@ -117,7 +120,6 @@ export default class WalletUtils {
    */
   static loadTokensList() {
     const { availableTokens, network, walletAddress } = store.getState();
-    console.log('store.getState()', store.getState());
 
     if (network !== 'mainnet') return Promise.resolve();
 
