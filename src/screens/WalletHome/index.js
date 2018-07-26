@@ -141,10 +141,10 @@ class WalletHome extends Component {
     const currentBalance = await WalletUtils.getBalance(
       this.props.selectedToken,
     );
-    console.log('currentBalance', currentBalance.toNumber());
+    console.log('currentBalance', currentBalance);
 
     this.setState({
-      currentBalance: currentBalance.toNumber(),
+      currentBalance: currentBalance,
     });
   };
 
@@ -157,9 +157,11 @@ class WalletHome extends Component {
       this.props.selectedToken,
     );
 
+    console.log('fetchTransactions transactions', transactions);
+
     this.setState({
       refreshingTransactions: false,
-      transactions,
+      transactions: transactions || [],
     });
   };
 
@@ -199,7 +201,7 @@ class WalletHome extends Component {
               {!!this.props.walletAddress && (
                 <TransactionsList
                   selectedToken={this.props.selectedToken}
-                  transactions={this.state.transactions || []}
+                  transactions={this.state.transactions}
                   walletAddress={this.props.walletAddress}
                   onRefresh={this.onRefresh}
                   refreshing={this.state.refreshingTransactions}

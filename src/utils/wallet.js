@@ -58,7 +58,6 @@ export default class WalletUtils {
   }
 
   static getWeb3HTTPProvider() {
-    console.log('Config.INFURA_API_KEY ', Config.INFURA_API_KEY);
     switch (store.getState().network) {
       case 'ropsten':
         return new Web3.providers.HttpProvider(
@@ -161,7 +160,7 @@ export default class WalletUtils {
    */
   static getTransactions({ contractAddress, decimals, symbol }) {
     if (symbol === 'ETH') {
-      return this.getEthTransactions(callback);
+      return this.getEthTransactions();
     }
 
     return this.getERC20Transactions(contractAddress, decimals);
@@ -174,9 +173,16 @@ export default class WalletUtils {
     console.log('getEthTransactions');
     const { walletAddress } = store.getState();
 
-    const web3 = new Web3(this.getWeb3HTTPProvider());
-
-    web3.eth.getTransaction(walletAddress);
+    return fetch(
+      `http://${this.getEtherscanApiSubdomain()}.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${
+        Config.ETHERSCAN_API_KEY
+      }`,
+    )
+      .then(response => response.json())
+      .then(data => {
+        console.log('getEthTransactions data', data);
+        return data.result;
+      });
   }
 
   /**
@@ -194,11 +200,10 @@ export default class WalletUtils {
    * Get the user's wallet balance of a given token
    *
    * @param {Object} token
-   * @param callback
    */
-  static getBalance({ contractAddress, symbol, decimals }, callback) {
+  static getBalance({ contractAddress, symbol, decimals }) {
     if (symbol === 'ETH') {
-      return this.getEthBalance(callback);
+      return this.getEthBalance();
     }
 
     return this.getERC20Balance(contractAddress, decimals);
@@ -216,7 +221,7 @@ export default class WalletUtils {
 
     return new Promise((resolve, reject) => {
       web3.eth.getBalance(walletAddress, (err2, balance) => {
-        resolve(balance);
+        resolve(balance.toNumber());
         reject(err2);
       });
     });
@@ -275,20 +280,17 @@ export default class WalletUtils {
    */
   static sendETHTransaction(toAddress, amount) {
     const web3 = this.getWeb3Instance();
-
-    // compiled solidity source code using https://chriseth.github.io/cpp-ethereum/
-    var code =
-      '603d80600c6000396000f3007c01000000000000000000000000000000000000000000000000000000006000350463c6888fa18114602d57005b6007600435028060005260206000f3';
+    console.log('sendETHTransaction toAddress ', toAddress, ' amount ', amount);
 
     web3.eth.sendTransaction(
       {
         from: web3.eth.defaultAccount,
         to: toAddress,
         value: amount,
-        // data: code
       },
       function(err, transactionHash) {
-        if (!err) console.log(transactionHash); // "0x7f9fade1c0d57a7af66ab4ead7c2eb7b11a91385"
+        if (!err)
+          console.log('sendETHTransaction transactionHash', transactionHash);
       },
     );
   }

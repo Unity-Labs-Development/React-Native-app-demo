@@ -58,10 +58,10 @@ export default class TransactionsList extends Component {
     }).isRequired,
     transactions: PropTypes.arrayOf(
       PropTypes.shape({
-        transactionHash: PropTypes.string.isRequired,
+        hash: PropTypes.string.isRequired,
         from: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
-        timestamp: PropTypes.string.isRequired,
+        timeStamp: PropTypes.string.isRequired,
       }),
     ).isRequired,
     walletAddress: PropTypes.string.isRequired,
@@ -79,7 +79,7 @@ export default class TransactionsList extends Component {
     return (
       <FlatList
         data={transactions}
-        keyExtractor={item => item.transactionHash}
+        keyExtractor={item => item.hash}
         ListEmptyComponent={
           <Text style={styles.emptyListText}>No transactions to show</Text>
         }
@@ -105,7 +105,7 @@ export default class TransactionsList extends Component {
                 </Text>
               </View>
               <Text style={styles.itemTimestamp}>
-                {moment(item.timestamp * 1000).fromNow()}
+                {moment(item.timeStamp * 1000).fromNow()}
               </Text>
             </View>
           </View>
